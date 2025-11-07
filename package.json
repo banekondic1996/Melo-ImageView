@@ -1,0 +1,35 @@
+{
+    "name": "Melo Image Viewer",
+    "version": "2.0",
+    "main": "index.html",
+    "chromium-args": "",
+    "user-agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114. 0.0.0 Mobile Safari/537.36",
+    "window": {
+        "frame": false,
+        "width": 1200,
+        "height": 720,
+        "position": "center",
+        "transparent": false,
+        "min_width": 350,
+        "min_height": 420
+    },
+    "webkit": {
+        "plugin": true
+    },
+    "webview": {
+        "partitions": [
+            {
+                "name": "trusted",
+                "accessible_resources": [
+                    "<all_urls>"
+                ]
+            }
+        ]
+    },
+    "scripts": {
+        "start": "nw ."
+    },
+    "dependencies": {
+        "sharp": "^0.34.5"
+    }
+}
