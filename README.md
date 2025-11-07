@@ -8,7 +8,9 @@ Working on:
   -Dragging while zoomed bug
   -Image information
   -Image thumbnail cache generation
-  -Image thumbnail lazy loading, folder lazy loading
+  -Image thumbnail lazy loading, folder lazy loading all
   -Tabs
+  -Zooming and moving picture
+  -Restyle video player
 </pre>
 ![2025-11-07_13-59-11_converted879](https://github.com/user-attachments/assets/4d5f9501-6e6a-4729-b9d4-0097a5c9644f)
