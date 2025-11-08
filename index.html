@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melo</title>
-    <!-- Load FontAwesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
-    <!--   <script src="../node_modules/nw-dev/lib/dev.js"></script> -->
-    <!-- script type="module" src="main.js" defer></script> -->
-    <!--  <script src="functions.js"></script> -->
-    <!-- CSS style -->
+    <title>Melo Image View</title>
     <style>
+   :root {
+    --selected: #c3c3c34a;
+    --playerUI:rgb(224 224 224 / 37%);
+    --contextColor:rgb(228 228 228 / 90%);
+    --imageBackground:#121212;
+    --alertBackground:rgba(103, 103, 103, 0.551);
+    --trHover:rgb(48, 48, 48);
+    --trActive:rgb(170, 64, 64);
+    --trActiveContext:rgb(205, 16, 16);
+    --transBar:#dddddd70;
+    }
   /* Forbid dragging of interface elements */
   *{
     user-select: none;       
     -webkit-user-drag: none;    
   }
   body {
-    background-color: rgb(255, 255, 255);
+    background: var(--imageBackground) !important;
     margin:0px;
     transition: background-color .5s;
     overflow: hidden;
@@ -559,7 +564,7 @@
     display: none;
     position: absolute;
     width: 134px;
-    height: 199px;
+    height: auto;
     background-color: rgb(228, 228, 228);
     opacity: 0.8;
     border: none;
@@ -571,6 +576,13 @@
   .contextMenuVideo td{
     text-align: center;
   }
+   .contextMenuVideo div{
+    background: var(--playerUI);
+    padding: 5px;
+  }
+  .contextMenuVideo div:hover{
+  filter:brightness(2);
+  } 
   #conversion{ 
     display:none;
     width: 50px;
@@ -621,22 +633,27 @@
     display: flex;
     position: absolute;
     width: 60%;
-    height: 60px;
-    background-color: #9393937a;
+    height: 80px;
+    background-color: var(--playerUI);
     border-radius: 20px;
     text-align: center;
     flex-wrap: nowrap;
     margin: auto;
     align-content: center;
     overflow-x: auto;
+    overflow-y: hidden;
     z-index: 999999;
   }
   #imageThumbnails img{
-    height: 50px;
-    width: auto;
+    height: 60px;
+    max-width: 70px;
+    min-width: 70px;
     margin: auto;
     margin-inline: 5px;
     z-index: 99999;
+    object-fit: contain;
+    scroll-behavior: smooth;
+    flex-shrink: 0;
     /* transition: height 0.2s; */
   }
   #imageThumbnails img:hover{
@@ -658,6 +675,9 @@
   }
   #rotateButton{
     right:48px!important;
+  }
+  #addButton{
+    right:77px!important;
   }
   #zoomButton{
     display: block!important;
@@ -716,12 +736,13 @@
   .image-pane{
     max-width: 100%;
     max-height: 100%;
-    background: black;
+    background: var(--imageBackground);
     align-content: center;
     width: 99%;
     height: 99%;
     text-align: center;
     z-index: 9999;
+    contain: paint;
   }
   .image-pane img{
     max-width: 100%;
@@ -749,13 +770,106 @@
   #thumbContainer{
     width: 100%;
     height: 100px;
-    bottom: 20px;
+    bottom: 30px;
     position: absolute;
     display: flex;
     justify-content: center;
   }
+#scrollRange{
+  appearance: none;
+   -webkit-appearance: none;
+    background: transparent;
+     outline: none;
+      width: 60%;
+    z-index: 999999;
+    position: absolute;
+    bottom: 20px;
+    background: transparent;
+}
+ /* Remove track in Webkit browsers */
+#scrollRange::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 10px;
+}
 
-  
+/* Thumb styling for Webkit */
+#scrollRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 100px;
+  height: 10px;
+  background: #9393937a;
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+  margin-top: 0; /* align properly with track */
+}
+
+/* Firefox thumb */
+#scrollRange::-moz-range-thumb {
+  width: 100px;
+  height: 10px;
+  background: #9393937a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Hide Firefox track */
+#scrollRange::-moz-range-track {
+  background: transparent;
+}
+
+/* IE/Edge */
+#scrollRange::-ms-thumb {
+  width: 100px;
+  height: 10px;
+  background: #9393937a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#scrollRange::-ms-track {
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+  height: 10px;
+} 
+  /* Crop overlay */
+  .crop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    z-index: 700;
+  }
+
+  .crop-overlay.active {
+    display: block;
+  }
+
+  .crop-container {
+    position: absolute;
+    border: 2px solid #5ef59b;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    cursor: move;
+  }
+
+  .crop-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #5ef59b;
+    border: 2px solid white;
+    border-radius: 50%;
+  }
+
+  .crop-handle.tl { top: -6px; left: -6px; cursor: nw-resize; }
+  .crop-handle.tr { top: -6px; right: -6px; cursor: ne-resize; }
+  .crop-handle.bl { bottom: -6px; left: -6px; cursor: sw-resize; }
+  .crop-handle.br { bottom: -6px; right: -6px; cursor: se-resize; }
 </style>
 </head>
 <body>
@@ -768,24 +882,27 @@
   </div>
   <div class="slider_container slider2" id="slikacontrol" style="background:rgb(238, 238, 238);display:none;">
     <div class="buttons">
-      <!-- <div class="prev-track" style="position: absolute;right:34px;padding: 0px;" onclick="zoomIn()"><img src="set/zoom_in.png" class="lMode"  width="22px" height="auto"></div>
-      <div class="next-track" style="position: absolute;right:1px;padding: 0px;" onclick="zoomOut()"><img src="set/zoom_out.png" class="lMode"  width="22px" height="auto"></div> -->
       <img class="piclamp lMode" onclick="darkmode()" src="set/lamp.png"  width="22px" height="auto">
       <div class="prev-track" onclick="prevTrack()"><img src="set/left.png" class="lMode" width="26px" height="auto"></div>
       <div class="next-track" onclick="nextTrack()"><img src="set/right.png" class="lMode" width="26px" height="auto"></div>
-      <img id="addButton" class="lMode" onclick="splitView()" src="set/add.png" style="position: absolute;right: 186px;height: 18px;width: 18px;">
+       <!-- <img id="addButton" class="lMode" onclick="startCrop()" src="set/crop.png" style="position: absolute;right: 222px;height: 17px;width: 17px;"> -->
+      <img id="addButton" class="lMode" onclick="splitView(track_list[track_index]?.path)" src="set/add.png" style="position: absolute;right: 191px;height: 17px;width: 17px;">
       <img id="rotateButton" class="lMode" onclick="rotatePicture()" src="set/repeat.png" style="position: absolute;right: 163px;height: 18px;width: 18px;">
       <img id="zoomButton" class="lMode" onclick="zoomOn();" src="set/zoom_in.png" style="display:none;position: absolute;right: 18px;height: 16px;width: 16px;">
       <input type="range" class="lMode" id="zoomSliderId" style="position: absolute;right:20px;padding: 0px;accent-color: currentcolor;" min="1" max="10" step="0.1" value="1"  onInput="zoomSlider()">
   </div>
   </div>
         <div id="thumbContainer">
-        <div id="imageThumbnails" class="hide-scrollbar" onmouseover="this.classList.add('focus');" onmouseleave="this.classList.remove('focus');">
-        </div>
-       <!--  <img src="media/123097127-selection-of-traditional-greek-food.jpg"></img>
-        <img src="media/123097127-selection-of-traditional-greek-food.jpg"></img> -->
-      
+          <div id="imageThumbnails" class="" onmouseover="this.classList.add('focus');" onmouseleave="this.classList.remove('focus');">
+          </div>
+        <!--  <img src="media/123097127-selection-of-traditional-greek-food.jpg"></img>
+          <img src="media/123097127-selection-of-traditional-greek-food.jpg"></img> -->
+           <!-- <input type="range" id="scrollRange" min="0" max="100" value="0" style=""> -->
       </div>
+      <div>
+      <!-- Range slider -->
+     
+    </div>
   <div class="inputDialog" id="unPauseAtTimeId">
     <input type="datetime-local" id="meeting-time" name="meeting-time" max="2039-08-08T00:00">
   <div style="margin: auto;height: auto;width: 85%;max-width: 188px;">
@@ -799,11 +916,6 @@
       </div>
     </div>
   <div class="anal" id="barId">
-  <!-- <div class="wcontrols"> 
-     <img class="wcontrols2 lMode" src="set/min.png" width="32px" height="auto">
-     <img class="wcontrols2 lMode"src="set/max.png" width="32px" height="auto">
-  <img class="wcontrols2 lMode"src="set/close.png" width="32px" height="auto">
-</div> -->
 <div class="tabovi-deActivate" style="display: none;" id="tabovi">
   <div class="tab">
     1
@@ -895,7 +1007,7 @@
         </tr>
       </table>
     </div>
-    <div class="contextMenuVideo" id="contextMenuVideoId">
+    <div class="contextMenuVideo" id="contextMenuVideoId"></div>
     <table>
     <tr onclick="convertDialog.style.display='flex';"><td>Convert</td></tr>
     <tr onclick=""><td>Load all media from folder</td></tr>
@@ -914,11 +1026,24 @@
     </div>
     <div id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="display:none;background:rgba(158, 20, 20, 0.582);width:100%;height:100%;position: absolute;z-index:9000;left:0px;top:0px">
 </div>
+  <!-- Crop Overlay -->
+  <div class="crop-overlay" id="cropOverlay">
+    <div class="crop-container" id="cropContainer">
+      <div class="crop-handle tl"></div>
+      <div class="crop-handle tr"></div>
+      <div class="crop-handle bl"></div>
+      <div class="crop-handle br"></div>
+    </div>
+  </div>
+  
     <!-- Main script for the player -->
     <script>
       document.addEventListener("keydown", (event) => {
      if(event.code=='Space'){
       playpauseTrack();
+     }
+      if(event.code=='Enter'){
+      applyCrop();
      }
      if(event.code=='ArrowLeft'){
       curr_track.pause();
@@ -975,78 +1100,108 @@
    document.addEventListener('dragover', function () {
       document.getElementById("drop_zone").style.display="block";
     });
+
 function dropHandler(ev) {
   console.log("File(s) dropped");
-  // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
+
+  let photoFPath = null;
+
   if (ev.dataTransfer.items) {
     // Use DataTransferItemList interface to access the file(s)
     [...ev.dataTransfer.items].forEach((item, i) => {
-      // If dropped items aren't files, reject them
       if (item.kind === "file") {
         const file = item.getAsFile();
         console.log(file);
         console.log(`… file[${i}].name = ${file.path}`);
-        let splitArg=file.path.split("\\");
-        let nameLen=splitArg.length-1;
-        let nameArg=splitArg[nameLen];
-        let photoFPath = file.path.substring(0, file.path.length-nameArg.length);
-        //readPhotosInFolder(photoFPath);
-        console.log(nameArg);
-        let theFile=newFileObj(nameArg,file.path,file.type);
+
+        // Normalize path separators to forward slashes, handle both Windows and Unix paths
+        const normalizedPath = file.path.replace(/\\/g, "/");
+        const lastSlashIndex = normalizedPath.lastIndexOf("/");
+
+        // If no slash found, treat whole as filename
+        const nameArg = lastSlashIndex === -1
+          ? normalizedPath
+          : normalizedPath.slice(lastSlashIndex + 1);
+
+        // Folder path is everything up to the last slash (incl. trailing slash).
+        // If you prefer no trailing slash, use .slice(0, lastSlashIndex)
+        photoFPath = lastSlashIndex === -1
+          ? ""
+          : normalizedPath.slice(0, lastSlashIndex + 1);
+
+        console.log("filename:", nameArg);
+        console.log("folderPath:", photoFPath);
+
+        const theFile = newFileObj(nameArg, file.path, file.type);
         console.log(theFile);
-      /*   if(!listOfPaths.includes(theFile.path)){ // To avoid double items in list
-          listOfPaths.push(theFile.path);
-          track_list.push(theFile);
-        } */
-        let found_file=0;
-        track_list.forEach(function(element,index) {
-          if (theFile.path==element.path){
-            if(theFile.type.includes('image')){
-            loadPicture();
+
+        // Check if already in track list
+        let found_file = false;
+        track_list.forEach((element, index) => {
+          if (theFile.path === element.path) {
+            if (theFile.type.includes("image")) {
+              loadPicture();
+            } else {
+              found_file = true;
+              track_index = index;
             }
-            else{
-            found_file=1;
-            track_index=index;
           }
+        });
+
+        // Add non-repeated file
+        if (!found_file) {
+          console.log("Push non-repeated file");
+          if (theFile.type.includes("image") || theFile.type.includes("video")) {
+            track_list.push(theFile);
           }
-       });
-       if(found_file==0){
-       console.log("push non repeated file");
-       if(theFile.type.includes('image') || theFile.type.includes('video')){
-        track_list.push(theFile);
-       }
-       track_index=track_list.length-1;
-      } 
+          track_index = track_list.length - 1;
+        }
       }
     });
+
+    // Load folder contents (thumbnails, etc.) only if we found a folder path
+    if (photoFPath) {
+      readPhotosInFolder(photoFPath);
+    }
   } else {
-    // Use DataTransfer interface to access the file(s)
+    // Fallback: Use DataTransfer interface to access the file(s)
     [...ev.dataTransfer.files].forEach((file, i) => {
       console.log(`… file[${i}].name = ${file.path}`);
     });
   }
-  document.getElementById("drop_zone").style.display="none";
-  let last_track=track_list[track_index];
+
+  document.getElementById("drop_zone").style.display = "none";
+
+  // Ensure track_index is valid before using it
+  if (typeof track_index !== "number" || track_index < 0 || track_index >= track_list.length) {
+    console.warn("Invalid track_index, nothing to open");
+    return;
+  }
+
+  const last_track = track_list[track_index];
   console.log(last_track);
-  loadThumbnails();
-if(last_track.type.includes('video')){
-  openVideo();
-}
-if(last_track.type.includes('image')){
-  pickaEl.src=last_track.path;
-  loadPicture();
-}
+
+  if (last_track.type.includes("video")) {
+    openVideo();
+  } else if (last_track.type.includes("image")) {
+    pickaEl.src = last_track.path;
+    loadPicture();
+  }
+
   loadTrack(track_index);
   playTrack();
 }
+
 console.log("errorrrrrrrrrrrrrr 2");
 function dragOverHandler(ev) {
   console.log("File(s) in drop zone");
   // Prevent default behavior (Prevent file from being opened)
   ev.preventDefault();
 }
+
 console.log("errorrrrrrrrrrrrrr 2");
+
 var win = nw.Window.get();
 win.resizeTo(1200,720);
 win.setPosition("center");
@@ -1090,7 +1245,7 @@ let elSlikaEl=document.getElementById("elSlikaId");
 let tabsBar=document.getElementById('tabovi');
 let tabsEl=tabsBar.getElementsByClassName("tab");
 var videoWasOpened=0,cImageRotation=0,seekEndDuration=0,seekStartDuration=0,VideoErr=0,prevThumbnail=0;
-let paneCount=1,activePaneId=1,scaleValue=1;
+let paneCount=1,activePaneId='pane0',scaleValue=1;
 const fs = require ('fs');
 let listOfPaths=[];
 const fileObj={
@@ -1254,7 +1409,9 @@ function darkmode(){
   
     case 'white':
 document.getElementById('floatdetailsId').style.color="white";
-document.body.style.backgroundColor = "black";
+document.documentElement.style.setProperty('--imageBackground', '#121212');
+
+
 // document.getElementById('barId').style.backgroundColor="black";
 document.getElementById('slider_container_Id').style.background="#08080870";
 document.getElementById('homeButtonsId').style.background="#08080870";
@@ -1280,13 +1437,13 @@ elements[i].style.background = "#838383";
 case 'black':
 document.getElementById('floatdetailsId').style.color="black";
 // document.getElementById('barId').style.backgroundColor="white";
-document.getElementById('slider_container_Id').style.background="#dddddd70";
-document.getElementById('homeButtonsId').style.background="#dddddd70";
-document.getElementById('slikacontrol').style.background="#dddddd70";
-volumeb.style.background="#dddddd70";
+document.getElementById('slider_container_Id').style.background="var(--playerUI)";
+document.getElementById('homeButtonsId').style.background="var(--playerUI)";
+document.getElementById('slikacontrol').style.background="var(--playerUI)";
+volumeb.style.background="var(--playerUI)";
 document.getElementById('durationCId').style.color="black";
 document.getElementById('durationEId').style.color="black";
-document.body.style.backgroundColor = "white";
+document.documentElement.style.setProperty('--imageBackground', '#d8d8d8');
 menuE.style.color="black";
 menuE.style.background="rgb(228, 228, 228)";
 
@@ -1299,8 +1456,7 @@ for (let item of imgs) {
  tabsBar.classList.add("darkMe");
   break;
   default:
-  document.getElementById('floatdetailsId').style.color="white";
-document.body.style.backgroundColor = "black";
+document.documentElement.style.setProperty('--imageBackground', '#121212');
 // document.getElementById('barId').style.backgroundColor="black";
 document.getElementById('slider_container_Id').style.background="#08080870";
 document.getElementById('homeButtonsId').style.background="#08080870";
@@ -1318,9 +1474,9 @@ for (let item of imgs) {
  infoEl.classList.add("darkMe2");
  tabsBar.classList.remove("darkMe");
 
-for (i = 0; i < elements.length; i++) {
-elements[i].style.background = "#838383";  
-}
+for (i = 0; i < elements.length; i++) {elements[i].style.background = "#838383";}
+
+
 
 } 
 }
@@ -1329,7 +1485,7 @@ let dateNowFormated= new Date().toISOString().slice(0, -8);
 document.getElementById("meeting-time").value=dateNowFormated;
 document.getElementById("meeting-time").min=dateNowFormated;
 console.log(dateNowFormated);
-// Generate thumbnail for image
+/* // Generate thumbnail for image
 async function generateThumbnail(fileObj) {
     try {
         const thumbnailPath = path.join(os.tmpdir(), `thumb_${Date.now()}.jpg`);
@@ -1343,44 +1499,50 @@ async function generateThumbnail(fileObj) {
             .toFile(thumbnailPath);
         
         fileObj.thumbnail = thumbnailPath;
-        updateThumbnailContainer();
     } catch (err) {
         console.error('Error generating thumbnail:', err);
         fileObj.thumbnail = fileObj.path; // Fallback to original
-        updateThumbnailContainer();
     }
 }
-// Load cached thumbnails from ~/.cache/thumbnails
-async function loadCachedThumbnails() {
-    const thumbnailDir = path.join(os.homedir(), '.cache', 'thumbnails', 'normal');
-    
-    if (!fs.existsSync(thumbnailDir)) {
-        return;
-    }
-    
-    try {
-        const files = fs.readdirSync(thumbnailDir);
-        console.log(`Found ${files.length} cached thumbnails`);
-    } catch (err) {
-        console.error('Error loading cached thumbnails:', err);
-    }
+ */
+function loadThumbnails() {
+  const container = imageThumbnails;
+  container.innerHTML = "";
+
+  const fragment = document.createDocumentFragment();
+
+  track_list.forEach((picture, index) => {
+    const img = document.createElement("img");
+    img.dataset.src = encodeURI(picture.thumbnail) || encodeURI(picture.path);
+    img.id = "F" + index;
+    img.loading = "lazy"; // native lazy loading (extra safety)
+
+    img.onclick = () => {
+      openPhoto(index);
+      moveThumbnail(index);
+    };
+
+    img.ondblclick = () => {
+      splitView(picture.path);
+    };
+
+    fragment.appendChild(img);
+  });
+
+  // Append all at once → minimal reflow
+  container.appendChild(fragment);
+
+  // Start lazy loading observer
+  LazyLoadThumbnails();
 }
-function loadThumbnails(){
-   imageThumbnails.innerHTML="";
-    track_list.forEach(function(pictureThumb,index){
-      imageThumbnails.innerHTML+="<img src='"+pictureThumb.path+"' id=F"+index+" onclick='openPhoto("+index+");moveThumbnail("+index+");'></img>"
-     })
-}
+
 function loadPicture(){
      playerGEl.style.display="none";
      infoEl.style.display="none";
      slikaControlEl.style.display="block";
      elSlikaEl.style.display="flex";
-
-    //  document.getElementById("slikatest").style.display="block";
-    //  document.getElementById("picka").src="";
-     document.getElementById("tabovi").style.display="flex";
-  
+     //Tabs disabled
+     //document.getElementById("tabovi").style.display="flex"; 
    }
    console.log("errorrrrrrrrrrrrrr 9");
 let error_track_src="";
@@ -1388,11 +1550,9 @@ function loadTrack(index) {
   track_index=index;
   clearInterval(updateTimer);
   resetValues();
-  if (track_list[track_index].type.includes("video")){
-    openVideo();
-    videoEl.style.display="block";
-  }
-  else if (track_list[track_index].type.includes('image')){
+  if (track_list[track_index].type.includes("video")){openVideo(); videoEl.style.display="block";}
+  else if (track_list[track_index].type.includes('image'))
+  {
     videoEl.style.display="none";
     document.getElementById(activePaneId).children[0].src=track_list[track_index].path;
     loadPicture();
@@ -1403,10 +1563,10 @@ function loadTrack(index) {
   // Update details of the track
   track_name.textContent = track_list[track_index].name;
   document.title = track_list[track_index].artist+' - '+track_list[track_index].name;
-  //now_playing.textContent = "PLAYING " + (track_index + 1) + " OF " + track_list.length;
   // Set an interval of 1000 milliseconds for updating the seek slider
   updateTimer = setInterval(seekUpdate, 1000);
   // Move to the next track if the current one finishes playing
+  // TO DO
 }
 curr_track.addEventListener('error', function() {
       console.log("Video error");
@@ -1514,7 +1674,7 @@ function prevTrack() {
   playTrack();
 }
 function openPhoto(index){
-   document.getElementById(activePaneId).children[0].src=track_list[index].path;
+   document.getElementById(activePaneId).children[0].src=encodeURI(track_list[index].path);
 }
 function moveThumbnail(index){
 
@@ -1703,10 +1863,18 @@ function trackMousePosition() {
     document.addEventListener('mouseup', function () {
       isMouseDownTitleBar = false;
       isMouseDownPicture = false;
+      win.setResizable(true)
     });
     console.log("errorrrrrrrrrrrrrr 17");
     // Add event listener for mouse move
     document.addEventListener('mousemove', handleMouseMove);
+    titleBar.addEventListener('mousedown', function ()
+      {
+        cX=event.clientX+5;
+        cY=event.clientY+30;
+        isMouseDownTitleBar = true;
+        win.setResizable(false);
+      });
   }
  
   // Call the function to start tracking mouse position
@@ -1743,8 +1911,8 @@ function trackMousePosition() {
     trackIndex=track_list.length-1;
     pickaEl.src=track_list[trackIndex].path;
     let photoFPath = track_list[trackIndex].path.substring(0, track_list[trackIndex].path.length-nameArg.length);
-    //readPhotosInFolder(photoFPath);
-    imageThumbnails.innerHTML+="<img src='"+pictureThumb.path+"' id=F"+index+" onclick='openPhoto("+index+");moveThumbnail("+index+");'></img>"
+    readPhotosInFolder(photoFPath);
+    //imageThumbnails.innerHTML+="<img src='"+pictureThumb.path+"' id=F"+index+" onclick='openPhoto("+index+");moveThumbnail("+index+");'></img>"
     loadPicture();
     }
   }
@@ -1790,7 +1958,7 @@ function trackMousePosition() {
       if(track_list[track_index].type.includes('image')){
         pickaEl.src=track_list[track_index].path;
         let photoFPath = track_list[track_index].path.substring(0, track_list[track_index].path.length-nameArg.length);
-        //readPhotosInFolder(photoFPath);
+        readPhotosInFolder(photoFPath);
         loadPicture();
         imageThumbnails.innerHTML+="<img src='"+pictureThumb.path+"' id=F"+index+" onclick='openPhoto("+index+");moveThumbnail("+index+");'></img>"
       }
@@ -1814,6 +1982,15 @@ if (document.addEventListener) {
     contextMenuVideo.style.display="block";
     contextMenuVideo.style.left=e.clientX+"px";
     contextMenuVideo.style.top=e.clientY+"px";
+    e.preventDefault();
+  }, false);
+   elSlikaEl.addEventListener('contextmenu', function(e) {
+
+    contextMenuVideo.innerHTML="";
+    contextMenuVideo.style.display="block";
+    contextMenuVideo.style.left=e.clientX+"px";
+    contextMenuVideo.style.top=e.clientY+"px";
+    contextMenuVideo.innerHTML="<div onclick='closePane(activePaneId)'>Close pane</div>"
     e.preventDefault();
   }, false);
 } else {
@@ -1915,78 +2092,348 @@ function rotatePicture(){
   const paneStates = {
     pane0: { rotation: 0, zoom: 1, index: 0, scrollX: 0, scrollY: 0 }
   };
- function readPhotosInFolder(folderPath){
-fs.readdir(folderPath, (err, files) => {
-      if (err) {
-        console.error('Error reading folder:', err);
-        return;
+ function readPhotosInFolder(folderPath) {
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      console.error('Error reading folder:', err);
+      return;
+    }
+
+    console.log('Files in folder:', files);
+    track_list = [];
+
+    files.forEach(file => {
+      if (/\.(jpe?g|gif|webp|avif|png|svg)$/i.test(file)) {
+        const photoFPath = folderPath + "" + file;
+        const theFile = newFileObj(file, photoFPath.toString(), 'image');
+        track_list.push(theFile);
       }
-      console.log('Files in folder:', files);
-      files.forEach(file => {
-        if(file.includes('.jpg') || file.includes('.jpeg') || file.includes('.gif') || file.includes('.webp') || file.includes('avif') || file.includes('png') || file.includes('svg')){
-        let photoFPath=folderPath+file;
-        let theFile=newFileObj(file,photoFPath,'image');
-        track_list.push(theFile);  
-        }
-        });
     });
+
+    initVirtualThumbnails();  
+  });
+}
+function initVirtualThumbnails() {
+  const container = document.getElementById("imageThumbnails");
+  container.innerHTML = "";
+
+  const chunkSize = 100; // how many to render at once
+  const buffer = 2;      // how many extra chunks to keep on each side
+  let startIndex = 0;
+  let endIndex = chunkSize;
+
+  // Helper: render visible range
+  function renderVisibleRange() {
+    container.innerHTML = "";
+    const fragment = document.createDocumentFragment();
+
+    for (let i = startIndex; i < endIndex && i < track_list.length; i++) {
+      const picture = track_list[i];
+      const img = document.createElement("img");
+      img.dataset.src = picture.thumbnail || picture.path;
+      img.id = "F" + i;
+      img.loading = "lazy";
+      img.style.width = "150px";
+      img.style.marginRight = "4px";
+
+      img.onclick = () => {
+        openPhoto(i);
+        moveThumbnail(i);
+      };
+
+      img.ondblclick = () => {
+        splitView(picture.path);
+      };
+
+      fragment.appendChild(img);
+    }
+
+    container.appendChild(fragment);
+    LazyLoadThumbnails();
   }
+
+  // Initial batch
+  renderVisibleRange();
+
+  // Scroll listener (horizontal)
+  container.addEventListener("scroll", () => {
+    const scrollLeft = container.scrollLeft;
+    const viewportWidth = container.clientWidth;
+    const totalWidth = container.scrollWidth;
+
+    // Estimate which chunk we’re in
+    const approxIndex = Math.floor((scrollLeft / totalWidth) * track_list.length);
+    const newStart = Math.max(0, Math.floor(approxIndex / chunkSize - buffer) * chunkSize);
+    const newEnd = Math.min(track_list.length, newStart + chunkSize * (1 + buffer * 2));
+
+    // Only re-render if range changed significantly
+    if (newStart !== startIndex || newEnd !== endIndex) {
+      startIndex = newStart;
+      endIndex = newEnd;
+      renderVisibleRange();
+    }
+  });
+}
+
+
   //First pane
    document.getElementById("pane0").addEventListener('click', () => {
           activePaneId = 'pane0';
           highlightActivePane();
         });
-function splitView() {
+function splitView(imgsrc)
+ {
       const workspace = document.getElementById('elSlikaId');
-      
-      if (paneCount < 3) {
+      if (paneCount < 3) 
+      {
         paneCount++;
         const newPaneId = `pane${paneCount - 1}`;
         const newPane = document.createElement('div');
         newPane.className = 'image-pane';
         newPane.id = newPaneId;
         const img = document.createElement('img');
-        img.src = track_list[track_index]?.path || '';
+        img.src = imgsrc;
         newPane.appendChild(img);
         workspace.appendChild(newPane);
-        
         // Initialize state for new pane
         paneStates[newPaneId] = { rotation: 0, zoom: 1, index: track_index, scrollX: 0, scrollY: 0 };
-        
         // Make pane clickable to set as active
-        newPane.addEventListener('click', () => {
-          activePaneId = newPaneId;
-          highlightActivePane();
-        });
-        
+        newPane.addEventListener('click', () => {activePaneId = newPaneId;highlightActivePane();});
+        newPane.addEventListener('contextmenu', () => {activePaneId = newPaneId;highlightActivePane();});
         activePaneId = newPaneId;
         highlightActivePane();
       }
     }
-
-    function closePane(paneId) {
+    function closePane(paneId) 
+    {
       if (paneCount === 1) return; // Don't close the last pane
-      
       const pane = document.getElementById(paneId);
       pane.remove();
       delete paneStates[paneId];
       paneCount--;
-      
       // Set first pane as active
       activePaneId = 'pane0';
       highlightActivePane();
     }
 
-    function highlightActivePane() {
-      document.querySelectorAll('.image-pane').forEach(pane => {
-        if (pane.id === activePaneId) {
-          pane.style.border = '2px solid #00ff672e';
-        } else {
-          pane.style.border = 'none';
-        }
+    function highlightActivePane() 
+    {
+      document.querySelectorAll('.image-pane').forEach(pane => 
+      {
+        if (pane.id === activePaneId) {pane.style.border = '1px solid #00ff672e';} 
+        else {pane.style.border = 'none';}
       });
     }
-loadPicture();
+    elSlikaEl.addEventListener('dblclick', function (e)
+    {
+    if(win.isKioskMode==false){win.enterFullscreen();isMax=1;win.setResizable(false);clearTimeout(videoHoldMouseTimeout)}
+    else if(win.isKioskMode==true){win.leaveFullscreen();isMax=0;win.setResizable(true);clearTimeout(videoHoldMouseTimeout)}
+    });
+
+    //Detached slider for thumbnails
+  /*   const range = document.getElementById('scrollRange');
+      range.addEventListener('input', () => 
+      {
+        imageThumbnails.scrollLeft = (imageThumbnails.scrollWidth - imageThumbnails.clientWidth) * (range.value / 100);
+      });
+      imageThumbnails.addEventListener('scroll', () => 
+      {
+        range.value = (imageThumbnails.scrollLeft / (imageThumbnails.scrollWidth - imageThumbnails.clientWidth)) * 100;
+      }); */
+
+
+//Lazy loading thumbnails
+// Select all thumbnails
+function LazyLoadThumbnails() {
+  const container = document.getElementById("imageThumbnails");
+  const thumbnails = container.querySelectorAll("img:not([data-observed])");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const img = entry.target;
+
+      if (entry.isIntersecting) {
+        // Visible → load image
+        if (!img.src) img.src = img.dataset.src;
+        img.dataset.visible = "true";
+      } else {
+        // Not visible → maybe unload
+        img.dataset.visible = "false";
+
+        const buffer = 2 * container.clientWidth;
+        const imgRight = img.offsetLeft + img.clientWidth;
+        const imgLeft = img.offsetLeft;
+        const viewLeft = container.scrollLeft - buffer;
+        const viewRight = container.scrollLeft + container.clientWidth + buffer;
+
+        if (imgRight < viewLeft || imgLeft > viewRight) {
+          img.removeAttribute("src");
+        }
+      }
+    });
+  }, {
+    root: container,
+    rootMargin: "200px",
+    threshold: 0.01
+  });
+
+  thumbnails.forEach(img => {
+    observer.observe(img);
+    img.dataset.observed = "true"; // means “is being tracked,” not “visible”
+  });
+}
+//Crop
+ function startCrop() {
+      const overlay = document.getElementById('cropOverlay');
+      overlay.classList.toggle('active');
+      
+      if (overlay.classList.contains('active')) {
+        initCrop();
+      }
+    }
+
+    function initCrop() {
+      const container = document.getElementById('cropContainer');
+      const pane = document.getElementById(activePaneId);
+      const img = pane.querySelector('img');
+      const rect = img.getBoundingClientRect();
+      
+      // Position crop container
+      container.style.left = rect.left + 50 + 'px';
+      container.style.top = rect.top + 50 + 'px';
+      container.style.width = rect.width - 100 + 'px';
+      container.style.height = rect.height - 100 + 'px';
+      
+      setupCropHandlers();
+    }
+
+    function setupCropHandlers() {
+      const container = document.getElementById('cropContainer');
+      const handles = container.querySelectorAll('.crop-handle');
+      let isResizing = false;
+      let isMoving = false;
+      let startX, startY, startWidth, startHeight, startLeft, startTop;
+      
+      // Make container draggable
+      container.addEventListener('mousedown', (e) => {
+        if (e.target === container) {
+          isMoving = true;
+          startX = e.clientX - container.offsetLeft;
+          startY = e.clientY - container.offsetTop;
+        }
+      });
+      
+      // Handle resizing
+      handles.forEach(handle => {
+        handle.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          isResizing = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = container.offsetWidth;
+          startHeight = container.offsetHeight;
+          startLeft = container.offsetLeft;
+          startTop = container.offsetTop;
+          
+          document.addEventListener('mousemove', resize);
+          document.addEventListener('mouseup', stopResize);
+          
+          function resize(e) {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            if (handle.classList.contains('br')) {
+              container.style.width = startWidth + dx + 'px';
+              container.style.height = startHeight + dy + 'px';
+            } else if (handle.classList.contains('bl')) {
+              container.style.width = startWidth - dx + 'px';
+              container.style.height = startHeight + dy + 'px';
+              container.style.left = startLeft + dx + 'px';
+            } else if (handle.classList.contains('tr')) {
+              container.style.width = startWidth + dx + 'px';
+              container.style.height = startHeight - dy + 'px';
+              container.style.top = startTop + dy + 'px';
+            } else if (handle.classList.contains('tl')) {
+              container.style.width = startWidth - dx + 'px';
+              container.style.height = startHeight - dy + 'px';
+              container.style.left = startLeft + dx + 'px';
+              container.style.top = startTop + dy + 'px';
+            }
+          }
+          
+          function stopResize() {
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+          }
+        });
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (isMoving) {
+          container.style.left = e.clientX - startX + 'px';
+          container.style.top = e.clientY - startY + 'px';
+        }
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isMoving = false;
+      });
+    }
+
+    function applyCrop() {
+      const container = document.getElementById('cropContainer');
+      const pane = document.getElementById(activePaneId);
+      const img = pane.querySelector('img');
+      
+      // Create canvas and crop the image
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      const cropRect = {
+        x: container.offsetLeft - img.offsetLeft,
+        y: container.offsetTop - img.offsetTop,
+        width: container.offsetWidth,
+        height: container.offsetHeight
+      };
+      
+      canvas.width = cropRect.width;
+      canvas.height = cropRect.height;
+      
+      const image = new Image();
+      image.onload = () => {
+        ctx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
+        img.src = canvas.toDataURL();
+      };
+      image.src = img.src;
+      
+      document.getElementById('cropOverlay').classList.remove('active');
+    }
+    function deletePhoto() {
+    const track = track_list[viewDataNew[currentViewNew].index];
+    if (!track || !track.type || !track.type.includes('image')) return;
+    
+    const confirm = window.confirm(`Delete ${track.name}?`);
+    if (!confirm) return;
+    
+    try {
+        const realPath = track.path.replace('file://', '');
+        fs.unlinkSync(realPath);
+        track_list.splice(viewDataNew[currentViewNew].index, 1);
+        updateThumbnailContainerNew();
+        
+        if (track_list.filter(t => t.type && t.type.includes('image')).length > 0) {
+            nextPhoto();
+        }
+        
+        alert('Photo deleted');
+    } catch (err) {
+        console.error('Error deleting photo:', err);
+        alert('Failed to delete photo');
+    }
+}
+
+  loadPicture();
+
     </script>
 </body>
 
