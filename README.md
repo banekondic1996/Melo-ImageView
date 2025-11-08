@@ -8,7 +8,7 @@ Working on:
   -Image information
   -Image thumbnail cache generation
   -Tabs
-  -Zooming and moving picture (iv-viewer? maybe or custom one)
+  -Zooming and moving picture (iv-viewer? maybe or custom one. Or panzoom which seems better using transform orgin CSS)
   -Restyle video player
   -Add EXR (JERI Viewer), HEIF support (libheif-js)
   -Crop option
