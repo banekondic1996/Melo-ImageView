@@ -3,12 +3,10 @@ Non vibe coded image viewer app for linux <br>
 
 Working on:
 <pre>
-  -Split view
   -Image editing
   -Dragging while zoomed bug
   -Image information
   -Image thumbnail cache generation
-  -Image thumbnail lazy loading, folder lazy loading all
   -Tabs
   -Zooming and moving picture
   -Restyle video player
