@@ -3,12 +3,15 @@ Non vibe coded image viewer app for linux <br>
 
 Working on:
 <pre>
-  -Image editing
+  -Image editing (brightness, contrast, saturation, highlights, shadows, sharpness)
   -Dragging while zoomed bug
   -Image information
   -Image thumbnail cache generation
   -Tabs
-  -Zooming and moving picture
+  -Zooming and moving picture (iv-viewer? maybe or custom one)
   -Restyle video player
+  -Add EXR (JERI Viewer), HEIF support (libheif-js)
+  -Crop option
+  -Draw on image option
 </pre>
 ![2025-11-07_13-59-11_converted879](https://github.com/user-attachments/assets/4d5f9501-6e6a-4729-b9d4-0097a5c9644f)
